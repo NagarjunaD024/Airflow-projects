@@ -1,5 +1,4 @@
 import json
-
 from airflow.decorators import dag, task, task_group
 from airflow.operators.empty import EmptyOperator  # Separate line
 from pendulum import datetime
