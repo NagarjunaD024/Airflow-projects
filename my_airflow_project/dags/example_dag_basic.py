@@ -1,9 +1,7 @@
 import json
 
-from airflow.decorators import (
-    dag,
-    task, EmptyOperator, task_group
-)
+from airflow.decorators import dag, task, task_group
+from airflow.operators.empty import EmptyOperator  # Import this separately
 from pendulum import datetime
 
 
