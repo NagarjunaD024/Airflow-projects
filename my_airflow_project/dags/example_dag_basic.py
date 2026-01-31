@@ -2,7 +2,7 @@ import json
 
 from airflow.decorators import (
     dag,
-    task,
+    task, EmptyOperator, task_group
 )
 from pendulum import datetime
 
@@ -46,6 +46,13 @@ def example_dag_basic():
 
         order_data_dict = json.loads(data_string)
         return order_data_dict
+    
+    @task_group(group_id='extraction_task_group')
+    def tg1():
+        order_data_from_task = extract()
+        t2 = EmptyOperator(task_id='task_2')
+        order_data_from_task >> t2
+        return order_data_from_task
 
     @task(multiple_outputs=True)  # multiple_outputs=True unrolls dictionaries into separate XCom values
     def transform(order_data_dict: dict):
@@ -71,7 +78,7 @@ def example_dag_basic():
 
         print(f"Total order value is: {total_order_value:.2f}")
 
-    order_data = extract()
+    order_data = tg1()
     order_summary = transform(order_data)
     load(order_summary["total_order_value"])
 
