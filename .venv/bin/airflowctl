@@ -1,0 +1,6 @@
+#!/workspaces/Airflow-projects/.venv/bin/python3
+import sys
+from airflowctl.cli import app
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(app())
