@@ -13,13 +13,19 @@ from datetime import datetime, timedelta
 
 dag_owner = 'Kendrick'
 
-def _get_pictures():
-    # Ensure directory exists
+def _get_pictures(ds, **kwargs):
+    # 1. Define the temporary directory
     output_dir = pathlib.Path("/tmp/images")
     output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # NASA API Setup
     api_key = 'cKxoWLqd6CvbgVjPb42UpoIC4Yse2Re1IozfQysJ'
     url = f'https://api.nasa.gov/planetary/apod?api_key={api_key}'
+    
+    # It is better to fetch the image for the specific Airflow 'ds' (logical date)
+    # but for simplicity, we use the URL from the API response
     response = requests.get(url).json()
+    
     if 'hdurl' in response:
         image_url = response['hdurl']
         # 2. Define the full file path inside the temp folder
@@ -33,32 +39,33 @@ def _get_pictures():
         print(f"Stored image at: {target_file}")
     else:
         print("No HD image found in the API response today.")
-    
-default_args = {'owner': dag_owner,
-        'depends_on_past': False,
-        'retries': 2,
-        'retry_delay': timedelta(minutes=5)
-        }
 
-with DAG(dag_id='download_ASOD_image',
-        default_args=default_args,
-        description='download and notify ',
-        start_date =airflow.utils.dates.days_ago(0),
-        schedule_interval='@daily',
-        catchup=True,
-        tags=['None']
-):
- 
-        get_pictures = PythonOperator(
-                task_id="get_pictures",
-                python_callable=_get_pictures,
-        )
- 
-        notify = BashOperator(
-                task_id="notify",
-                bash_command='echo "Images for $today_date have been added!"',
+default_args = {
+    'owner': dag_owner,
+    'depends_on_past': False,
+    'retries': 2,
+    'retry_delay': timedelta(minutes=5)
+}
 
-        )
- 
-get_pictures >> notify
- 
+with DAG(
+    dag_id='download_ASOD_image',
+    default_args=default_args,
+    description='Download NASA APOD and notify',
+    start_date=airflow.utils.dates.days_ago(1),
+    schedule_interval='@daily',
+    catchup=False,
+    tags=['NASA']
+) as dag:
+
+    get_pictures = PythonOperator(
+        task_id="get_pictures",
+        python_callable=_get_pictures,
+    )
+
+    notify = BashOperator(
+        task_id="notify",
+        # Using {{ ds }} to dynamically show the date in the message
+        bash_command='echo "Images for {{ ds }} have been added to /tmp/images!"',
+    )
+
+    get_pictures >> notify
