@@ -1,12 +1,15 @@
-.git
-airflow.cfg
-airflow.db
-airflow-webserver.pid
-webserver_config.py
-logs
+# Python virtual environment (THE BIG CULPRIT)
+.venv/
+venv/
+env/
+
+# Airflow dynamic files
+*.db
+*.cfg
+*.log
 standalone_admin_password.txt
-.DS_Store
+.airflowctl/
+
+# IDE files
+.vscode/
 __pycache__/
-.env
-.venv
-.airflowctl
