@@ -11,7 +11,7 @@ from airflow.operators.python import PythonOperator
 from airflow.decorators import task
 from datetime import datetime, timedelta 
 
-dag_owner = 'Kendrick'
+dag_owner = 'Nagarjuna'
 
 def _get_pictures(ds, **kwargs):
     # 1. Define the temporary directory
