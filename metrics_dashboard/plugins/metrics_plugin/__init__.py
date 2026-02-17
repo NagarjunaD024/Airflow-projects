@@ -4,7 +4,7 @@ from __future__ import annotations
 from airflow.plugins_manager import AirflowPlugin
 from flask import Blueprint
 
-from plugins.metrics_plugin.views.dashboard import MetricsDashboardView
+from metrics_plugin.views.dashboard import MetricsDashboardView
 
 # Creating a flask blueprint
 metrics_blueprint = Blueprint(
