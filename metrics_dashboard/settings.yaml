@@ -1,5 +1,5 @@
 # Airflow version to be installed
-airflow_version: "3.1.7"
+airflow_version: "2.10.4"
 
 # Python version for the project
 python_version: "3.9.25"
