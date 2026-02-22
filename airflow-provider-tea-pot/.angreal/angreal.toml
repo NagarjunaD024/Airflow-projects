@@ -1,0 +1,7 @@
+airflow_version = "2.10.4"
+author_email = "nanduairflow@gmail.com"
+author_name = "Gottipati"
+name = "Tea Pot"
+provider_name = "airflow-provider-tea-pot"
+provider_slug = "tea_pot"
+short_description = "custom distribution"
