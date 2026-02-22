@@ -1,41 +1,27 @@
-from tea_pot.triggers import TeaPotTrigger
-
+from airflow_provider_tea_pot.sensors import WaterLevelSensor
+from airflow.exceptions import TaskDeferred
 import pytest
-import asyncio
-
-def test_trigger():
-
-    trigger = TeaPotTrigger()
-
-    assert isinstance(trigger,TeaPotTrigger)
-
-    classpath, kwargs = trigger.serialize()
 
 
-@pytest.mark.asyncio
-async def test_trigger_run_good(mocker):
+def test_water_level_defers():
+    """ Test our sensor immediately enteres a deferred state on execute"""
+    sensor = WaterLevelSensor(
+        tea_pot_conn_id = "tea_pot_other",
+        minimum_level = 0.7,
+        task_id = "test"
+    )
 
-    trigger = TeaPotTrigger()
-
-    mocked_rv = {}
-    mocker.patch.object( Object, "method", return_value = mocked_rv) # mock whatever return you need to make your trigger return from deferred state
-
-    task = asyncio.create_task(trigger.run().__anext__())
-    await asyncio.sleep(1.0)
-    assert task.done() is True
-    asyncio.get_event_loop().stop()
-    
+    with pytest.raises(TaskDeferred):
+        sensor.execute(context={})
 
 
-@pytest.mark.asyncio
-async def test_trigger_run_bad(mocker):
 
-    trigger2 = TeaPotTrigger()
+def test_water_level_execute_complete():
+    """ Test execute_complete method works as intended """
+    sensor = WaterLevelSensor(
+        tea_pot_conn_id = "tea_pot_other",
+        minimum_level = 0.7,
+        task_id = "test"
+    )
 
-    mocked_rv = {}
-    mocker.patch.object( Object, "method", return_value = mocked_rv) # mock whatever return you need to make your trigger return from deferred state
-
-    task2 = asyncio.create_task(trigger2.run().__anext__())
-    await asyncio.sleep(1.0)
-    assert task2.done() is False
-    asyncio.get_event_loop().stop()
+    assert "test" == sensor.execute_complete(context={}, event="test")
